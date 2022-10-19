@@ -3,7 +3,6 @@
 use std::io::{self, Write};
 
 pub mod operation;
-
 use crate::operation::{fraction::fr::Fraction, op::make_operation};
 
 fn main() {
