@@ -5,7 +5,10 @@ pub mod op {
     use super::fraction::fr::Fraction;
 
     // make an operation and return the result as a fraction
-    pub fn make_operation(str : String) -> Fraction {
+    pub fn make_operation(mut str : String) -> Fraction {
+        if str.as_bytes()[0] as char == '-' {
+            str = "0".to_string() + &str; // add a 0 at the beginning so that negative numbers work
+        }
         let mut fr_vec: Vec<Fraction> = Vec::new(); // list of fractions
         let mut op_vec: Vec<char> = Vec::new();     // list of operators
     
@@ -36,7 +39,7 @@ pub mod op {
                     fr_vec.push(new_fraction);
                     br_found = true;
                 }
-                '*' | '/' | '+' | '-' | '\r' => {
+                '*' | '/' | '+' | '-' | '^' | '\r' => {
                     op_vec.push(ch);
                     if !br_found { // add a new fraction to the vector; if a bracket was found, it means it was already added to the vector
                         let mut str_part = str[first_sub..i].to_string();
@@ -51,7 +54,22 @@ pub mod op {
             i += 1;
         }
     
-        // do the multiplication and division in the first place
+        // do exponantation
+        let mut ind: i32 = op_vec.len() as i32 - 1; // cannot be unsigned, otherwise it could break when decrementing when it's 0
+        while ind >= 0 {
+            let uind = ind as usize;
+            match op_vec[uind] {
+                '^' => {
+                    let new_fr = Fraction::new_val(fr_vec[uind].value().powf(fr_vec[uind + 1].value()));
+                    fr_vec[uind] = new_fr;
+                    op_vec.remove(uind);
+                    fr_vec.remove(uind + 1);
+                }
+                _ => { ind -= 1; }
+            }
+        }
+
+        // do multiplication and division
         let mut ind = 0;
         while ind < op_vec.len() {
             match op_vec[ind] {
@@ -69,7 +87,7 @@ pub mod op {
             }
         }
     
-        // then do addition and substraction
+        // do addition and substraction
         let mut ind = 0;
         while ind < op_vec.len() {
             match op_vec[ind] {
