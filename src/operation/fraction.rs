@@ -3,7 +3,7 @@ pub mod fr {
     
     pub type FrI = i64; // int type for numenator and denominator
     pub type FrF = f64; // float type for the real value
-    
+
     // gcd algorithm (works also for negative numbers)
     fn gcd(mut a: FrI, mut b: FrI) -> FrI {
         while b != 0 {
@@ -17,7 +17,7 @@ pub mod fr {
     #[derive(Debug, Copy, Clone, PartialEq)]
     pub struct Fraction {
         pub num: FrI, // numenator
-        pub den: FrI  // denomiantor
+        pub den: FrI,  // denomiantor
     }
 
     impl Fraction {
@@ -30,7 +30,14 @@ pub mod fr {
         pub fn new_val_str(st : &mut String) -> Self {
             let point = st.find('.');//.unwrap();
             if point == None {
-                let num = st.parse::<FrI>().unwrap();
+                let try_num = st.parse::<FrI>();
+                let mut num : FrI = 0;
+                match try_num {
+                    Ok(val) => { num = val },
+                    Err(e) => {
+                        println!("Invalid characters!");
+                    }
+                }
                 return Fraction { num, den: 1 };
             }
     
